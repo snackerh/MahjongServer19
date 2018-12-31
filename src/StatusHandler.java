@@ -7,7 +7,7 @@ public class StatusHandler {
 	
 	public static void initialize() {
 		roundStatus = new ArrayList<String>();
-		matchStatus = new ArrayList<ArrayList<String>>();;
+		matchStatus = new ArrayList<ArrayList<String>>();
 	}
 	
 	public static boolean isPlaying() {

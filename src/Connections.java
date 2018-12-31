@@ -22,6 +22,8 @@ public class Connections {
 		idList.set(position, id);
 		connection++;
 		
+		System.out.println("Server: connected clients=" + connection);
+		
 		if(connection == 4) {
 			StatusHandler.initialize();
 		}
@@ -36,6 +38,7 @@ public class Connections {
 			idList.set(index, null);
 			connection--;
 		}
+		System.out.println("Server: connected clients=" + connection);
 		return ret;
 	}
 	
