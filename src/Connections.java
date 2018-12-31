@@ -1,14 +1,54 @@
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class Connections {
 	private static int connection;
-	private static ArrayList<ClientManager> clientList = new ArrayList<ClientManager>();
+	private static ArrayList<PrintWriter> clientList = new ArrayList<PrintWriter>();
 	private static ArrayList<String> idList = new ArrayList<String>();
 	
 	public static void initialize() {
 		connection = 0;
-		clientList = new ArrayList<ClientManager>();
+		clientList = new ArrayList<PrintWriter>();
 		idList = new ArrayList<String>();
+		
+		for(int i = 0; i < 4; i++) {
+			clientList.add(null);
+			idList.add(null);
+		}
+	}
+	
+	public static void add(PrintWriter writer, String id, int position) {
+		clientList.set(position, writer);
+		idList.set(position, id);
+		connection++;
+		
+		if(connection == 4) {
+			StatusHandler.initialize();
+		}
+	}
+	
+	public static String remove(PrintWriter writer) {
+		String ret = null;
+		int index = clientList.indexOf(writer);
+		if(index != -1) {
+			ret = idList.get(index);
+			clientList.set(index, null);
+			idList.set(index, null);
+			connection--;
+		}
+		return ret;
+	}
+	
+	public static String getIdList() {
+		return idList.get(0) + "#%" + idList.get(1) + "#%" + idList.get(2) + "#%" + idList.get(3); 
+	}
+	
+	public static void sendMessage(String msg) {
+		for(int i = 0; i < 4; i++) {
+			if(clientList.get(i) != null) {
+				clientList.get(i).println(msg);
+			}
+		}
 	}
 	
 	public static int getConnection() {
@@ -23,7 +63,4 @@ public class Connections {
 		return (idList.contains(id) ? true : false);
 	}
 	
-	public static void set(ClientManager client) {
-		
-	}
 }

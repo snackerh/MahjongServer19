@@ -17,21 +17,17 @@ public class ClientManager extends Thread {
 	public ClientManager(Socket s) {
 		socket = s;
 	}
-	
-	private void sendMessage(String msg) {
 		
-	}
-	
 	private void closeSocket() {
 		try {
 			writer.close();
 			reader.close();
 		} catch (Exception e) {}
 	}
-	
+		
 	public void run() {
 		try {
-			writer = new PrintWriter(socket.getOutputStream());
+			writer = new PrintWriter(socket.getOutputStream(), true);
 			
 			if (Connections.getConnection() == 4) {
 				System.out.println("Server: Server is full");
@@ -44,6 +40,11 @@ public class ClientManager extends Thread {
 				reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				
 				msg = reader.readLine();
+				System.out.println("Messgae: " + msg);
+				
+				if(msg == null) {
+					break;
+				}
 				
 				String[] split = msg.split("####");
 				
@@ -65,11 +66,27 @@ public class ClientManager extends Thread {
 						closeSocket();
 						return;
 					}
-				} 
+					Connections.add(writer, id, pos);
+					System.out.println("Server: " + id + " entered the server");
+					Connections.sendMessage(Connections.getIdList());
+					Connections.sendMessage("" + Connections.getConnection());
+				} else if(split[0].equals("curr") || split[0].equals("new") ||
+						  split[0].equals("near") || split[0].equals("prev") ||
+						  split[0].equals("middle") || split[0].equals("end")) {
+					StatusHandler.process(msg);
+				} else {
+					
+				}
+				
 			}
 			
 		} catch (Exception e) {
-			
+			System.out.println("System: ERROR");
+			e.printStackTrace();
+		} finally {
+			System.out.println("Server: connection terminated");
+			Connections.remove(writer);
+			closeSocket();
 		}
 	}
 

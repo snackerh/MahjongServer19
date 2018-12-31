@@ -24,7 +24,7 @@ public class Main {
 				ClientManager client = new ClientManager(socket);
 				
 				client.start();
-				System.out.println("Server: new client established");
+				System.out.println("Server: new connection established");
 			}
 		} catch (Exception e) {
 			System.out.println("System: ERROR");
