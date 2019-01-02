@@ -70,14 +70,11 @@ public class ClientManager extends Thread {
 					System.out.println("Server: " + id + " entered the server");
 					Connections.sendMessage("Server>" + Connections.getIdList());
 					Connections.sendMessage("" + Connections.getConnection());
-				} else if(split[0].equals("curr") || split[0].equals("new") ||
-						  split[0].equals("near") || split[0].equals("prev") ||
-						  split[0].equals("middle") || split[0].equals("end")) {
-					StatusHandler.process(msg);
+				} else if(split[0].equals("recover") {
+					StatusHandler.recover(pos);
 				} else {
-					
+					StatusHandler.process(msg, pos);
 				}
-				
 			}
 			
 		} catch (Exception e) {
