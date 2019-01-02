@@ -68,7 +68,7 @@ public class ClientManager extends Thread {
 					}
 					Connections.add(writer, id, pos);
 					System.out.println("Server: " + id + " entered the server");
-					Connections.sendMessage(Connections.getIdList());
+					Connections.sendMessage("Server>" + Connections.getIdList());
 					Connections.sendMessage("" + Connections.getConnection());
 				} else if(split[0].equals("curr") || split[0].equals("new") ||
 						  split[0].equals("near") || split[0].equals("prev") ||
