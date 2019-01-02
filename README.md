@@ -1,7 +1,7 @@
 # MahjongServer19
 
 **MahjongServer19** is a JAVA server application used in mahjong that accepts 4 players at once.
-This repository is closely related to **Mahjong Net Client**(which can be found in [this repository](https://github.com/snackerh/mahjongNetClient)), so check out both repository if you are willing to contribute. Thanks in advance.
+This repository is closely related to **Mahjong Net Client**(which can be found in [this repository, branch 201901](https://github.com/snackerh/mahjongNetClient/tree/201901)), so check out both repository if you are willing to contribute. Thanks in advance.
 
 This application has some limitations, though. 
 
