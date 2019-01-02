@@ -14,7 +14,15 @@ public class StatusHandler {
 		return (matchStatus.size() != 0 || roundStatus.size() != 0);
 	}
 	
-	public static void process(String msg) {
+	public static void sendRecovery(int position) {
+		if(Connections.isPositionTaken(position)) {
+			if(!roundStatus.isEmpty()) {
+				Connections.sendMessage("Server>recover>" + roundStatus.get(roundStatus.size()-1), position);
+			}
+		}
+	}
+	
+	public static void process(String msg, int pos) {
 		String[] split = msg.split("####");
 		
 		if(split[0].equals("new")) {
@@ -40,24 +48,26 @@ public class StatusHandler {
 			} else {
 				roundStatus.remove(roundStatus.size()-1);
 			}
-			Connections.sendMessage("Server>near>" + roundStatus.get(roundStatus.size()-1));
+			Connections.sendMessageAll("Server>near>" + roundStatus.get(roundStatus.size()-1));
 		} else if(msg.equals("middle")) {
 			String temp = roundStatus.get(0);
 			
 			roundStatus.clear();
 			roundStatus.add(temp);
-			Connections.sendMessage("Server>middle>" + roundStatus.get(0));
+			Connections.sendMessageAll("Server>middle>" + roundStatus.get(0));
 		} else if(msg.equals("far")) {
 			String temp = matchStatus.get(matchStatus.size()-1).get(0);
 			
 			matchStatus.remove(matchStatus.size()-1);
 			roundStatus.clear();
 			roundStatus.add(temp);
-			Connections.sendMessage("Server>far" + roundStatus.get(0));
+			Connections.sendMessageAll("Server>far" + roundStatus.get(0));
 		} else if(split[0].equals("start")) {
 			if (!isPlaying()) {
 				roundStatus.add(split[1]);
 			}
+		} else {
+			Connections.sendMessageExcept(msg, pos);
 		}
 	}
 }
