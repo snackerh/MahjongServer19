@@ -54,6 +54,12 @@ public class Connections {
 		}
 	}
 	
+	public static void sendMessage(String msg, int position) {
+		if(clientList.get(position) != null) {
+			clientList.get(position).println(msg);
+		}
+	}
+	
 	public static int getConnection() {
 		return connection;
 	}
