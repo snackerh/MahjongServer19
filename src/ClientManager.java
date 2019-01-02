@@ -68,8 +68,8 @@ public class ClientManager extends Thread {
 					}
 					Connections.add(writer, id, pos);
 					System.out.println("Server: " + id + " entered the server");
-					Connections.sendMessage("Server>" + Connections.getIdList());
-					Connections.sendMessage("" + Connections.getConnection());
+					Connections.sendMessageAll("Server>" + Connections.getIdList());
+					Connections.sendMessageAll("" + Connections.getConnection());
 				} else if(split[0].equals("recover") {
 					StatusHandler.recover(pos);
 				} else {
