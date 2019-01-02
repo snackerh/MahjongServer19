@@ -46,9 +46,18 @@ public class Connections {
 		return idList.get(0) + "#%" + idList.get(1) + "#%" + idList.get(2) + "#%" + idList.get(3); 
 	}
 	
-	public static void sendMessage(String msg) {
+	public static void sendMessageAll(String msg) {
 		for(int i = 0; i < 4; i++) {
 			if(clientList.get(i) != null) {
+				clientList.get(i).println(msg);
+			}
+		}
+	}
+	
+	public static void sendMessageExcept (String msg, int position) {
+		for(int i = 0; i < 4; i++) {
+			if(i == position) continue;
+			else if (ClientList.get(i) != null) {
 				clientList.get(i).println(msg);
 			}
 		}
