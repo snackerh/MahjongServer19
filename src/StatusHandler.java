@@ -61,7 +61,7 @@ public class StatusHandler {
 			matchStatus.remove(matchStatus.size()-1);
 			roundStatus.clear();
 			roundStatus.add(temp);
-			Connections.sendMessageAll("Server>far" + roundStatus.get(0));
+			Connections.sendMessageAll("Server>far>" + roundStatus.get(0));
 		} else if(split[0].equals("start")) {
 			if (!isPlaying()) {
 				roundStatus.add(split[1]);
