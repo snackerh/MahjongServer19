@@ -70,8 +70,8 @@ public class ClientManager extends Thread {
 					System.out.println("Server: " + id + " entered the server");
 					Connections.sendMessageAll("Server>" + Connections.getIdList());
 					Connections.sendMessageAll("" + Connections.getConnection());
-				} else if(split[0].equals("recover") {
-					StatusHandler.recover(pos);
+				} else if(split[0].equals("recover")) {
+					StatusHandler.sendRecovery(pos);
 				} else {
 					StatusHandler.process(msg, pos);
 				}

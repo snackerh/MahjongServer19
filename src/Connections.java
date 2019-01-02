@@ -57,7 +57,7 @@ public class Connections {
 	public static void sendMessageExcept (String msg, int position) {
 		for(int i = 0; i < 4; i++) {
 			if(i == position) continue;
-			else if (ClientList.get(i) != null) {
+			else if (clientList.get(i) != null) {
 				clientList.get(i).println(msg);
 			}
 		}
