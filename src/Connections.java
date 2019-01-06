@@ -58,7 +58,7 @@ public class Connections {
 		for(int i = 0; i < 4; i++) {
 			if(i == position) continue;
 			else if (clientList.get(i) != null) {
-				clientList.get(i).println(msg);
+				clientList.get(i).println(idList.get(position) + ">" + msg);
 			}
 		}
 	}
