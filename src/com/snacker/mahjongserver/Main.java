@@ -1,27 +1,30 @@
+package com.snacker.mahjongserver;
+
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Main {
 
-	static ServerSocket serversocket;
+	static ServerSocket server;
+	static RoomManager rm;
+	static int port = 9001;
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Connections.initialize();
-		runServer();
+		rm = new RoomManager();
+		runServer(port);
 	}
 
-	private static void runServer() {
-		boolean running = true;
-		System.out.println("Server: booting up server, port 9004");
+	private static void runServer(int port) {
+		System.out.println("Server: booting up server, port " + port);
 		try {
-			serversocket = new ServerSocket(9004);
+			server = new ServerSocket(port);
 			
-			while(running) {
+			while(true) {
 				System.out.println("Server: waiting for new connection");
 				
-				Socket socket = serversocket.accept();
-				ClientManager client = new ClientManager(socket);
+				Socket socket = server.accept();
+				Client client = new Client(socket);
 				
 				client.start();
 				System.out.println("Server: new connection established");
@@ -31,7 +34,7 @@ public class Main {
 			e.printStackTrace();
 		} finally {
 			try {
-				serversocket.close();
+				server.close();
 			} catch (Exception e) {}
 		}
 	}
