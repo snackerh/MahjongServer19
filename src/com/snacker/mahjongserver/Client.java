@@ -84,8 +84,11 @@ public class Client extends Thread {
 						break;
 					} else {
 						// do calculation
-						room.parseCommand(msg);
-						//room.sendBroadcast(msg);
+						if(room.isBlocked()) {
+							System.out.println("Room is currently parsing previous command");
+						} else {
+							room.parseCommand(msg);
+						}
 					}
 				} while(true);
 			} catch (SocketException e) {

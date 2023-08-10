@@ -25,5 +25,10 @@ public class Calculate {
 		}
 		return score;
 	}
+
+	public static int getDrawScore(int number) {
+		if(number == 0 || number == 4) return 0;
+		else return 3000 / number;
+	}
 	
 }

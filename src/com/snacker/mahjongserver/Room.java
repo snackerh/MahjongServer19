@@ -10,6 +10,7 @@ public class Room {
 	private ArrayList<Client> clients;
 	private String id;
 	private RoundStatus roundStatus;
+	private boolean mBlock = false;
 	
 	public Room(String arg) {
 		clients = new ArrayList<Client>();
@@ -51,6 +52,14 @@ public class Room {
 		}
 		return count;
 	}
+
+	public void setBlocked(boolean block) {
+		mBlock = block;
+	}
+
+	public boolean isBlocked() {
+		return mBlock;
+	}
 	
 	public int sendBroadcast(String msg) {
 		for(int i = 0; i < 4; i++) {
@@ -67,11 +76,13 @@ public class Room {
 	 * <seat>::tsumo::<han>::<fu>
 	 * <seat>::ron::<han>::<fu>::<loser>
 	 * <seat>::chonbo
-	 * <seat>::draw
+	 * <seat>::draw::<tenpai>::<tenpai>::<tenpai>::<tenpai>
 	 * <seat>::restore
 	 * <seat>::rewind::<option>
 	 */
 	public void parseCommand(String msg) {
+		setBlocked(true);
+		
 		String[] arr = msg.split("::");
 		int seat = Integer.parseInt(arr[0]);
 		int han, fu;
@@ -135,7 +146,29 @@ public class Room {
 			}
 			break;
 		case "draw":
-			// TODO: what should we do?
+			// tenpai = 1, no-ten = 0, starting from fixed seat 0
+			int tenpaiNum = 0;
+			int winScore = 0;
+			int loseScore = 0;
+			
+			for (int i = 2; i < 6; i++) {
+				tenpaiNum += Integer.parseInt(arr[i]);
+			}
+			winScore = Calculate.getDrawScore(tenpaiNum);
+			loseScore = Calculate.getDrawScore(4 - tenpaiNum); 
+			
+			for (int i = 0; i < 4; i++) {
+				if(Integer.parseInt(arr[i + 2])) {
+					clients.get(i).getStatus().addScore(winScore);
+				} else {
+					clients.get(i).getStatus().addScore(-loseScore);
+				}
+			}
+			if (Integer.parseInt(arr[roundStatus.getDealer()])) {
+				roundStatus.goNextRound(false, true);
+			} else {
+				roundStatus.goNextRound(true, true);
+			}
 			break;
 		case "restore":
 			// TODO: send roundstatus to requester, we need a format that client should parse it
@@ -146,6 +179,22 @@ public class Room {
 		default:
 			System.out.println("Unknown command");
 			break;
+		}
+
+		setBlocked(false);
+	}
+
+	public String getRoomStatus() {
+	/* <round>::<extend>::<pot>::<score>::...::<riichi>::...*/
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(roundStatus.getRound()+"::");
+		stringBuilder.append(roundStatus.getExtend()+"::");
+		stringBuilder.append("pot"+"::");
+		for (int i = 0; i < 4; i++) {
+			stringBuilder.append(clients.get(i).getStatus().getScore() + "::");
+		}
+		for (int i = 0; i < 4; i++) {
+			stringBuilder.append(clients.get(i).getStatus().getScore() + "::");
 		}
 	}
 }
