@@ -21,7 +21,7 @@ public class Main {
 			server = new ServerSocket(port);
 			
 			while(true) {
-				System.out.println("Server: waiting for new connection");
+				//System.out.println("Server: waiting for new connection");
 				
 				Socket socket = server.accept();
 				Client client = new Client(socket);

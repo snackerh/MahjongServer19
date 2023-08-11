@@ -2,15 +2,14 @@ package com.snacker.MahjongFunction;
 
 public class PlayerStatus {
 	private int seatIndex;
-	private int score;
+	private String id;
 	
 	public PlayerStatus() {
-		setScore(30000);
 	}
 	
-	public PlayerStatus(int index) {
+	public PlayerStatus(String id, int index) {
+		setId(id);
 		setSeatIndex(index);
-		setScore(30000);
 	}
 
 	public int getSeatIndex() {
@@ -21,16 +20,12 @@ public class PlayerStatus {
 		this.seatIndex = seatIndex;
 	}
 
-	public int getScore() {
-		return score;
+	public String getId() {
+		return id;
 	}
 
-	public void setScore(int score) {
-		this.score = score;
+	public void setId(String id) {
+		this.id = id;
 	}
-	
-	public void addScore(int score) {
-		this.score += score;
-	}
-	
+
 }

@@ -19,8 +19,8 @@ public class Calculate {
 		case Constants.SEX_YAKUMAN: 	score = 48000 * modifier; break;
 		default:
 			score = ((int) Math.ceil((fu * Math.pow(2, han + 2) * modifier) / 100)) * 100;
-			if (score > 8000) {
-				score = 8000;
+			if (score > 2000 * modifier) {
+				score = 2000 * modifier;
 			}			
 		}
 		return score;

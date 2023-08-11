@@ -44,18 +44,20 @@ public class Client extends Thread {
 	
 	public void run() {
 		String msg;
+		String id;
 		try {
 				out = new PrintWriter(sock.getOutputStream(), true);
 				in = new BufferedReader(new InputStreamReader(sock.getInputStream()));
 				
 				msg = in.readLine();
 				
-				String[] array = msg.split("::");
-				roomid = array[0];
-				index = Integer.parseInt(array[1]);
+				String[] array = msg.split("\\|");
+				id = array[0];
+				roomid = array[1];
+				index = Integer.parseInt(array[2]);
 				
-				System.out.println(roomid);
-				System.out.println(index);
+				//System.out.println(roomid);
+				//System.out.println(index);
 				
 				room = Main.rm.findRoom(roomid);
 				if (room == null) {
@@ -72,14 +74,21 @@ public class Client extends Thread {
 					throw new Exception();
 				} else {
 					room.setUser(index, this);
-					status = new PlayerStatus(index);
+					status = new PlayerStatus(id, index);
+					System.out.println("Room <" + roomid + ">, user <" + id + ">, index " + index);
+					if(room.getUserNum() == 4 && room.get().getRoundStatus().getRound() == -1) {
+						room.get().getRoundStatus().goNextRound(true, false);
+						room.get().getRoundStatus().addHistory(room.get().getMatchString());
+						room.sendBroadcast("start");
+					}
+					room.sendBroadcast(room.getMatchString());
 				}
 				
 				do {
 					msg = in.readLine();
-					System.out.println("Got message:" + msg);
-					if(msg.equals(MsgType.MSG_STOP.toString())) {
-						System.out.println("Info: Room <" + roomid + ">, remove user " + index);
+					System.out.println("From room " + roomid + ": " + msg);
+					if(msg.endsWith("stop")) {
+						System.out.println("Info: Room <" + roomid + ">, remove user <" + id + ">");
 						deleteUserIfValid();
 						break;
 					} else {
@@ -95,10 +104,12 @@ public class Client extends Thread {
 				System.out.println("Client Connection lost");
 				//e.printStackTrace();
 			} catch (Exception e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 			} finally {
+				room.setBlocked(false);
 				try {
 					deleteUserIfValid();
+					room.sendBroadcast(room.getMatchString());
 					System.out.println("Sending stop to client");
 					out.println("stop");
 					out.close();

@@ -61,6 +61,10 @@ public class Room {
 		return mBlock;
 	}
 	
+	public RoundStatus getRoundStatus() {
+		return roundStatus;
+	}
+	
 	public int sendBroadcast(String msg) {
 		for(int i = 0; i < 4; i++) {
 			Client client = clients.get(i);
@@ -73,65 +77,102 @@ public class Room {
 	}
 	
 	/* Suggested cmd format
-	 * <seat>::tsumo::<han>::<fu>
-	 * <seat>::ron::<han>::<fu>::<loser>
-	 * <seat>::chonbo
-	 * <seat>::draw::<tenpai>::<tenpai>::<tenpai>::<tenpai>
-	 * <seat>::restore
-	 * <seat>::rewind::<option>
+	 * tsumo|<han>|<fu>
+	 * ron|<han>|<fu>|<loser>
+	 * riichi
+	 * chonbo|<loser>
+	 * draw|<tenpai>|<tenpai>|<tenpai>|<tenpai>
+	 * restore
+	 * rewind|<option>
 	 */
 	public void parseCommand(String msg) {
 		setBlocked(true);
 		
-		String[] arr = msg.split("::");
+		String[] arr = msg.split("\\|");
+		if(arr.length < 2) {
+			System.out.println("[" + this.id + "] Warning: input string format length too short");
+		}
+		if(getUserNum() != 4) {
+			System.out.println("[" + this.id + "] Error: room is not full!");
+			setBlocked(false);
+			return;
+		}
+		
 		int seat = Integer.parseInt(arr[0]);
 		int han, fu;
 		int score;
+		int winScore = 0;
+		int loseScore = 0;
+		int loser; 
+		
 		int extend = roundStatus.getExtend();
 		switch(arr[1]) {
 		case "tsumo":
 			han = Integer.parseInt(arr[2]);
 			fu = Integer.parseInt(arr[3]);
+			
+			winScore = roundStatus.getPot();
+			
 			if(seat == roundStatus.getDealer()) {
-				score = Calculate.getScore(han, fu, 2) + 100*extend;
+				loseScore = Calculate.getScore(han, fu, 2) + 100*extend;
+				winScore += Calculate.getScore(han, fu, 6) + 100*extend;
 				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
-					clients.get(i).getStatus().addScore(-score);
-					clients.get(seat).getStatus().addScore(score);
+					roundStatus.addScore(i, -loseScore);
 				}
+				roundStatus.addScore(seat, winScore);
+				
 				roundStatus.goNextRound(false, true);
+				roundStatus.resetPot();
 			} else {
 				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
 					if(i == roundStatus.getDealer())
-						score = Calculate.getScore(han, fu, 2) + 100*extend;
-					else score = Calculate.getScore(han, fu, 1) + 100*extend;
-					clients.get(i).getStatus().addScore(-score);
-					clients.get(seat).getStatus().addScore(score);
+						loseScore = Calculate.getScore(han, fu, 2) + 100*extend;
+					else loseScore = Calculate.getScore(han, fu, 1) + 100*extend;
+					winScore += loseScore;
+					roundStatus.addScore(i, -loseScore);
 				}
+				roundStatus.addScore(seat, winScore);
+				
 				roundStatus.goNextRound(true, false);
+				roundStatus.resetPot();
 			}
 			break;
 		case "ron":
 			han = Integer.parseInt(arr[2]);
 			fu = Integer.parseInt(arr[3]);
-			int loser = Integer.parseInt(arr[4]);
+			loser = Integer.parseInt(arr[4]);
+			
+			winScore = roundStatus.getPot();
+			
 			if(seat == roundStatus.getDealer()) {
-				score = Calculate.getScore(han, fu, 6) + 300*extend;
-				clients.get(loser).getStatus().addScore(-score);
-				clients.get(seat).getStatus().addScore(score);
+				loseScore = Calculate.getScore(han, fu, 6) + 300*extend;
+				winScore += loseScore;
+				roundStatus.addScore(loser, -loseScore);
+				roundStatus.addScore(seat, winScore);
+				
 				roundStatus.goNextRound(false, true);
 			} else {
-				score = Calculate.getScore(han, fu, 4) + 300*extend;
-				clients.get(loser).getStatus().addScore(-score);
-				clients.get(seat).getStatus().addScore(score);
+				loseScore = Calculate.getScore(han, fu, 4) + 300*extend;
+				winScore += loseScore;
+				roundStatus.addScore(loser, -loseScore);
+				roundStatus.addScore(seat, winScore);
 				roundStatus.goNextRound(true, false);
 			}
+
+			roundStatus.resetPot();
+			break;
+		case "riichi":
+			roundStatus.addScore(seat, -1000);
+			roundStatus.addPot(1000);
+			roundStatus.setRiichi(seat, true);
 			break;
 		case "chonbo":
+			loser = Integer.parseInt(arr[2]); 
 			if(seat == roundStatus.getDealer()) {
 				score = Calculate.getScore(5, 0, 2);
 				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
-					clients.get(i).getStatus().addScore(score);
-					clients.get(seat).getStatus().addScore(-score);
+					roundStatus.addScore(i, score);
+					roundStatus.addScore(seat, -score);
 				}
 				roundStatus.goNextRound(false, false);
 			} else {
@@ -139,17 +180,24 @@ public class Room {
 					if(i == roundStatus.getDealer())
 						score = Calculate.getScore(5, 0, 2);
 					else score = Calculate.getScore(5, 0, 1);
-					clients.get(i).getStatus().addScore(score);
-					clients.get(seat).getStatus().addScore(-score);
+					roundStatus.addScore(i, score);
+					roundStatus.addScore(seat, -score);
 				}
 				roundStatus.goNextRound(false, false);
 			}
+			
+			for(int i = 0; i < 4; i++) {
+				if(roundStatus.isRiichi(i)) {
+					roundStatus.addScore(i, 1000);
+					roundStatus.addPot(-1000);
+					roundStatus.setRiichi(i, false);
+				}
+			}
+			
 			break;
 		case "draw":
 			// tenpai = 1, no-ten = 0, starting from fixed seat 0
 			int tenpaiNum = 0;
-			int winScore = 0;
-			int loseScore = 0;
 			
 			for (int i = 2; i < 6; i++) {
 				tenpaiNum += Integer.parseInt(arr[i]);
@@ -158,43 +206,73 @@ public class Room {
 			loseScore = Calculate.getDrawScore(4 - tenpaiNum); 
 			
 			for (int i = 0; i < 4; i++) {
-				if(Integer.parseInt(arr[i + 2])) {
-					clients.get(i).getStatus().addScore(winScore);
+				if(Integer.parseInt(arr[i + 2]) == 1) {
+					roundStatus.addScore(i, winScore);
 				} else {
-					clients.get(i).getStatus().addScore(-loseScore);
+					roundStatus.addScore(i, -loseScore);
 				}
 			}
-			if (Integer.parseInt(arr[roundStatus.getDealer()])) {
+			if (Integer.parseInt(arr[roundStatus.getDealer()]) == 1) {
 				roundStatus.goNextRound(false, true);
 			} else {
 				roundStatus.goNextRound(true, true);
 			}
+			roundStatus.resetRiichi();
 			break;
 		case "restore":
 			// TODO: send roundstatus to requester, we need a format that client should parse it
 			break;
 		case "rewind":
-			// TODO: we need more implementation to use this
+			int option = Integer.parseInt(arr[2]);
+			String result = roundStatus.rewind(option);
 			break;
 		default:
 			System.out.println("Unknown command");
 			break;
 		}
 
+		switch(arr[1]) {
+			case "tsumo":
+			case "ron":
+			case "riichi":
+			case "draw":
+			case "chonbo":
+				roundStatus.addHistory(getMatchString());
+				break;
+			default: // do nothing;
+						
+		}
+		
+		System.out.println("[" + this.id + "] " + getMatchString());
+		sendBroadcast(getMatchString());
+		if(roundStatus.getRound() == roundStatus.MAX_ROUND) {
+			sendBroadcast("finish");
+		}
 		setBlocked(false);
 	}
 
-	public String getRoomStatus() {
-	/* <round>::<extend>::<pot>::<score>::...::<riichi>::...*/
+	public String getMatchString() {
+	/* <round>|<extend>|<pot>|<score>|...|<riichi>|...*/
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(roundStatus.getRound()+"::");
-		stringBuilder.append(roundStatus.getExtend()+"::");
-		stringBuilder.append("pot"+"::");
+		stringBuilder.append(roundStatus.getRound()+"|");
+		stringBuilder.append(roundStatus.getExtend()+"|");
+		stringBuilder.append(roundStatus.getPot()+"|");
+		
 		for (int i = 0; i < 4; i++) {
-			stringBuilder.append(clients.get(i).getStatus().getScore() + "::");
+			if(clients.get(i) != null) {
+				stringBuilder.append(clients.get(i).getStatus().getId() + "|");
+			} else {
+				stringBuilder.append("|");
+			}
+		}
+		
+		for (int i = 0; i < 4; i++) {
+			stringBuilder.append(getRoundStatus().getScore(i) + "|");
 		}
 		for (int i = 0; i < 4; i++) {
-			stringBuilder.append(clients.get(i).getStatus().getScore() + "::");
+			stringBuilder.append(getRoundStatus().isRiichi(i) + "|");
 		}
+		
+		return stringBuilder.toString();
 	}
 }
