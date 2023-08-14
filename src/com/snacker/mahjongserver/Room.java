@@ -64,13 +64,16 @@ public class Room {
 	public RoundStatus getRoundStatus() {
 		return roundStatus;
 	}
-	
-	public int sendBroadcast(String msg) {
+
+	/* every broadcast format should be: 
+	 * <command>|<message>
+	 */ 
+	public int sendBroadcast(String cmd, String msg) {
 		for(int i = 0; i < 4; i++) {
 			Client client = clients.get(i);
 			if (client != null) {
 				PrintWriter out = client.getPrintWriter();
-				out.println(msg);
+				out.println(cmd + "|" + msg);
 			}
 		}
 		return 0;
@@ -244,19 +247,20 @@ public class Room {
 		}
 		
 		System.out.println("[" + this.id + "] " + getMatchString());
-		sendBroadcast(getMatchString());
+		sendBroadcast("status", getMatchString());
 		if(roundStatus.getRound() == roundStatus.MAX_ROUND) {
-			sendBroadcast("finish");
+			sendBroadcast("command", "finish");
+			// TODO: save result to log
 		}
 		setBlocked(false);
 	}
 
 	public String getMatchString() {
-	/* <round>|<extend>|<pot>|<score>|...|<riichi>|...*/
+	/* <round>|<extend>|<pot>|<id>|...|<score>|...|<riichi>|...*/
 		StringBuilder stringBuilder = new StringBuilder();
-		stringBuilder.append(roundStatus.getRound()+"|");
-		stringBuilder.append(roundStatus.getExtend()+"|");
-		stringBuilder.append(roundStatus.getPot()+"|");
+		stringBuilder.append(roundStatus.getRound() + "|");
+		stringBuilder.append(roundStatus.getExtend() + "|");
+		stringBuilder.append(roundStatus.getPot() + "|");
 		
 		for (int i = 0; i < 4; i++) {
 			if(clients.get(i) != null) {
@@ -267,10 +271,10 @@ public class Room {
 		}
 		
 		for (int i = 0; i < 4; i++) {
-			stringBuilder.append(getRoundStatus().getScore(i) + "|");
+			stringBuilder.append(roundStatus.getScore(i) + "|");
 		}
 		for (int i = 0; i < 4; i++) {
-			stringBuilder.append(getRoundStatus().isRiichi(i) + "|");
+			stringBuilder.append(roundStatus.isRiichi(i) + "|");
 		}
 		
 		return stringBuilder.toString();

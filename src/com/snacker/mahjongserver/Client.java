@@ -79,9 +79,9 @@ public class Client extends Thread {
 					if(room.getUserNum() == 4 && room.get().getRoundStatus().getRound() == -1) {
 						room.get().getRoundStatus().goNextRound(true, false);
 						room.get().getRoundStatus().addHistory(room.get().getMatchString());
-						room.sendBroadcast("start");
+						room.sendBroadcast("command", "start");
 					}
-					room.sendBroadcast(room.getMatchString());
+					room.sendBroadcast("status", room.getMatchString());
 				}
 				
 				do {
@@ -109,7 +109,7 @@ public class Client extends Thread {
 				room.setBlocked(false);
 				try {
 					deleteUserIfValid();
-					room.sendBroadcast(room.getMatchString());
+					room.sendBroadcast("status", room.getMatchString());
 					System.out.println("Sending stop to client");
 					out.println("stop");
 					out.close();
