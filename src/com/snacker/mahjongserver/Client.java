@@ -31,7 +31,7 @@ public class Client extends Thread {
 		if (index != -1) {
 			room.deleteUser(index);
 			if(room.getUserNum() == 0) {
-				System.out.println("room <" + roomid + "> deleted!");
+				Main.logger.info("room <" + roomid + "> deleted!");
 				Main.rm.deleteRoom(room);
 				index = -1;
 			}
@@ -63,19 +63,19 @@ public class Client extends Thread {
 				if (room == null) {
 					room = new Room(roomid);
 					Main.rm.addRoom(room);
-					System.out.println("added room <" + roomid + ">");
+					Main.logger.info("added room <" + roomid + ">");
 				} else {
-					System.out.println("found room <" + roomid + ">");
+					Main.logger.info("found room <" + roomid + ">");
 				}
 				
 				if(room.getUser(index) != null) {
-					System.out.println("Error: Room <" + roomid + ">, user " + index + " already taken");
+					Main.logger.warning("Room <" + roomid + ">, user " + index + " already taken");
 					index = -1;
 					throw new Exception();
 				} else {
 					room.setUser(index, this);
 					status = new PlayerStatus(id, index);
-					System.out.println("Room <" + roomid + ">, user <" + id + ">, index " + index);
+					Main.logger.info("Room <" + roomid + ">, user <" + id + ">, index " + index);
 					if(room.getUserNum() == 4 && room.get().getRoundStatus().getRound() == -1) {
 						room.get().getRoundStatus().goNextRound(true, false);
 						room.get().getRoundStatus().addHistory(room.get().getMatchString());
@@ -86,22 +86,22 @@ public class Client extends Thread {
 				
 				do {
 					msg = in.readLine();
-					System.out.println("From room " + roomid + ": " + msg);
+					Main.logger.info("From room " + roomid + ": " + msg);
 					if(msg.endsWith("stop")) {
-						System.out.println("Info: Room <" + roomid + ">, remove user <" + id + ">");
+						Main.logger.info("Info: Room <" + roomid + ">, remove user <" + id + ">");
 						deleteUserIfValid();
 						break;
 					} else {
 						// do calculation
 						if(room.isBlocked()) {
-							System.out.println("Room is currently parsing previous command");
+							Main.logger.warning("Room is currently parsing previous command");
 						} else {
 							room.parseCommand(msg);
 						}
 					}
 				} while(true);
 			} catch (SocketException e) {
-				System.out.println("Client Connection lost");
+				Main.logger.warning("Client Connection lost");
 				//e.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -110,7 +110,7 @@ public class Client extends Thread {
 				try {
 					deleteUserIfValid();
 					room.sendBroadcast("status", room.getMatchString());
-					System.out.println("Sending stop to client");
+					Main.logger.info("Sending stop to client");
 					out.println("stop");
 					out.close();
 					in.close();

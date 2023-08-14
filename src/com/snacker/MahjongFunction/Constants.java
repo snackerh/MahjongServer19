@@ -15,4 +15,9 @@ public class Constants {
 	public final static int QUAD_YAKUMAN = 12;
 	public final static int QUIN_YAKUMAN = 13;
 	public final static int SEX_YAKUMAN = 14;
+	
+	public final static int HOW_TSUMO_CHILD = 1;
+	public final static int HOW_TSUMO_DEALER = 2;
+	public final static int HOW_RON_CHILD = 3;
+	public final static int HOW_RON_DEALER = 4;
 }

@@ -31,4 +31,147 @@ public class Calculate {
 		else return 3000 / number;
 	}
 	
+	public static Pair getMinRequired(int score, int goal, int how, int modifier) {
+		// TODO: take account of the seat index in the case of same score
+		Pair pair = new Pair();
+		
+		if(score >= goal) {
+			pair.set(0, 0);
+		} else {
+			switch(how) {
+				case Constants.HOW_TSUMO_CHILD:
+					for(int j = 20; j <= 110; j=j+10) { 
+						if(2* getScore(1, j, 1) + getScore(1, j, 2) >= (goal - score) - getScore(1, j, modifier)) {
+							if(j % 20 == 0) {
+								pair.set(2, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}
+					for(int j = 60; j <= 110; j=j+10) {
+						if(2 * getScore(2, j, 1) + getScore(2, j, 2) >= (goal - score) - getScore(2, j, modifier)) {
+							if(j % 20 == 0) {
+								pair.set(3, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}
+					if(2 * getScore(3, 60, 1) + getScore(3, 60, 2)  >= (goal - score) - getScore(3, 60, modifier)) {
+						pair.set(4, 30); // 3 han 60 fu == (3+1) han (60/2) fu
+						return pair;
+					}
+					for(int i = Constants.MANGAN; i <= Constants.SEX_YAKUMAN; i++) {
+						if(getScore(i, 0, 4) >= goal - score - getScore(i, 0, modifier)) {
+							pair.set(i, 0);
+							return pair;
+						}
+					}
+					break;
+				case Constants.HOW_TSUMO_DEALER:
+					for(int j = 20; j <= 110; j=j+10) { 
+						if(4 * getScore(1, j, 2) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(2, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}	
+					for(int j = 60; j <= 110; j=j+10) {
+						if(4 * getScore(2, j, 2) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(3, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}					
+					if(4 * getScore(3, 60, 2)  >= (goal - score)) {
+						pair.set(4, 30); // 3 han 60 fu == (3+1) han (60/2) fu
+						return pair;
+					}
+					for(int i = Constants.MANGAN; i <= Constants.SEX_YAKUMAN; i++) {
+						if(4 * getScore(i, 0, 2) >= goal - score) {
+							pair.set(i, 0);
+							return pair;
+						}
+					}
+					break;
+				case Constants.HOW_RON_CHILD:
+					for(int j = 20; j <= 110; j=j+10) { 
+						if(2 * getScore(1, j, 4) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(2, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}	
+					for(int j = 60; j <= 110; j=j+10) {
+						if(2 * getScore(2, j, 4) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(3, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}					
+					if(2 * getScore(3, 60, 4)  >= (goal - score)) {
+						pair.set(4, 30); // 3 han 60 fu == (3+1) han (60/2) fu
+						return pair;
+					}
+					for(int i = Constants.MANGAN; i <= Constants.SEX_YAKUMAN; i++) {
+						if(2 * getScore(i, 0, 4) >= goal - score) {
+							pair.set(i, 0);
+							return pair;
+						}
+					}
+					break;
+				case Constants.HOW_RON_DEALER:
+					for(int j = 20; j <= 110; j=j+10) { 
+						if(2 * getScore(1, j, 6) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(2, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}	
+					for(int j = 60; j <= 110; j=j+10) {
+						if(2 * getScore(2, j, 6) >= (goal - score)) {
+							if(j % 20 == 0) {
+								pair.set(3, j/2); // X han Y fu == (X+1) han (Y/2) fu
+							} else {
+								pair.set(1, j);
+							}
+							return pair;
+						}
+					}					
+					if(2 * getScore(3, 60, 6)  >= (goal - score)) {
+						pair.set(4, 30); // 3 han 60 fu == (3+1) han (60/2) fu
+						return pair;
+					}
+					for(int i = Constants.MANGAN; i <= Constants.SEX_YAKUMAN; i++) {
+						if(2 * getScore(i, 0, 6) >= goal - score) {
+							pair.set(i, 0);
+							return pair;
+						}
+					}
+					break;					
+			}			
+		}
+		
+
+		return pair;
+	}
+	
 }

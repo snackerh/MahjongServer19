@@ -76,6 +76,8 @@ public class Room {
 				out.println(cmd + "|" + msg);
 			}
 		}
+		
+		Main.logger.info("[" + this.id + "] command=" + cmd + ", message=" + msg);
 		return 0;
 	}
 	
@@ -93,10 +95,12 @@ public class Room {
 		
 		String[] arr = msg.split("\\|");
 		if(arr.length < 2) {
-			System.out.println("[" + this.id + "] Warning: input string format length too short");
+			Main.logger.warning("[" + this.id + "] input string format length too short");
+			setBlocked(false);
+			return;
 		}
 		if(getUserNum() != 4) {
-			System.out.println("[" + this.id + "] Error: room is not full!");
+			Main.logger.warning("[" + this.id + "] room is not full");
 			setBlocked(false);
 			return;
 		}
@@ -227,10 +231,10 @@ public class Room {
 			break;
 		case "rewind":
 			int option = Integer.parseInt(arr[2]);
-			String result = roundStatus.rewind(option);
+			roundStatus.rewind(option);
 			break;
 		default:
-			System.out.println("Unknown command");
+			Main.logger.warning("Unknown command");
 			break;
 		}
 
@@ -246,7 +250,7 @@ public class Room {
 						
 		}
 		
-		System.out.println("[" + this.id + "] " + getMatchString());
+		Main.logger.info("[" + this.id + "] " + getMatchString());
 		sendBroadcast("status", getMatchString());
 		if(roundStatus.getRound() == roundStatus.MAX_ROUND) {
 			sendBroadcast("command", "finish");

@@ -1,12 +1,15 @@
 package com.snacker.MahjongFunction;
 
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 public class RoundStatus {
 	public final int MAX_ROUND;
 	int round = -1;
 	int extend = 0;
 	int pot = 0;
+	public Logger logger;
+	
 	// Each round is distinguished by different ArrayList<String>
 	ArrayList<ArrayList<String>> history = new ArrayList<ArrayList<String>>();
 	
@@ -86,7 +89,9 @@ public class RoundStatus {
 	/* option: 1 = Rewind to just before 
 	 * 2 = Rewind to start of this round
 	 * 3 = Rewind to last of previous round */
-	public String rewind(int option) {
+	public void rewind(int option) {
+		logger = Logger.getLogger("com.snacker.mahjongserver");
+		
 		ArrayList<String> currentRound = history.get(history.size()-1);
 		ArrayList<String> previousRound;
 		if(history.size() >= 2) {
@@ -102,7 +107,7 @@ public class RoundStatus {
 				result = currentRound.get(currentRound.size()-1);
 			} else {
 				if(history.size() == 1) {
-					System.out.println("Error: no more history to rewind");
+					logger.warning("no more history to rewind");
 				} else {
 					history.remove(history.size()-1);
 					result = previousRound.get(previousRound.size()-1);
@@ -124,7 +129,7 @@ public class RoundStatus {
 		if(result != "") {
 			parseHistory(result);
 		}
-		return result;
+		//return result;
 	}
 	
 	public void parseHistory(String history) {

@@ -1,22 +1,35 @@
 package com.snacker.mahjongserver;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
 
 public class Main {
 
 	static ServerSocket server;
 	static RoomManager rm;
 	static int port = 9001;
+	static Logger logger;
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
+		logger.setLevel(Level.INFO);
+		
+		Handler handler = new FileHandler("log.log", true);
+		LogFormatter formatter = new LogFormatter();
+		handler.setFormatter(formatter);
+		logger.addHandler(handler);
+		
 		rm = new RoomManager();
 		runServer(port);
 	}
 
 	private static void runServer(int port) {
-		System.out.println("Server: booting up server, port " + port);
+		logger.info("Server: booting up server, port " + port);
 		try {
 			server = new ServerSocket(port);
 			
@@ -27,10 +40,10 @@ public class Main {
 				Client client = new Client(socket);
 				
 				client.start();
-				System.out.println("Server: new connection established");
+				logger.info("new connection established");
 			}
 		} catch (Exception e) {
-			System.out.println("System: ERROR");
+			logger.severe("ERROR");
 			e.printStackTrace();
 		} finally {
 			try {
