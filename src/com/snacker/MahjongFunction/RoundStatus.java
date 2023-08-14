@@ -86,11 +86,12 @@ public class RoundStatus {
 		history.get(history.size()-1).add(entry);
 	}
 	
-	/* option: 1 = Rewind to just before 
+	/* option: 
+	 * 1 = Rewind to just before 
 	 * 2 = Rewind to start of this round
 	 * 3 = Rewind to last of previous round */
 	public void rewind(int option) {
-		logger = Logger.getLogger("com.snacker.mahjongserver");
+		//logger = Logger.getLogger("com.snacker.mahjongserver");
 		
 		ArrayList<String> currentRound = history.get(history.size()-1);
 		ArrayList<String> previousRound;
@@ -107,7 +108,7 @@ public class RoundStatus {
 				result = currentRound.get(currentRound.size()-1);
 			} else {
 				if(history.size() == 1) {
-					logger.warning("no more history to rewind");
+					//logger.warning("no more history to rewind");
 				} else {
 					history.remove(history.size()-1);
 					result = previousRound.get(previousRound.size()-1);

@@ -118,27 +118,25 @@ public class Room {
 			han = Integer.parseInt(arr[2]);
 			fu = Integer.parseInt(arr[3]);
 			
-			winScore = roundStatus.getPot();
-			
 			if(seat == roundStatus.getDealer()) {
-				loseScore = Calculate.getScore(han, fu, 2) + 100*extend;
-				winScore += Calculate.getScore(han, fu, 6) + 100*extend;
-				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
-					roundStatus.addScore(i, -loseScore);
+				loseScore = Calculate.getScore(han, fu, 2, 100*extend);
+				for(loser = (seat + 1); loser != seat; loser = ((loser + 1)%4)) {
+					winScore += loseScore;
+					roundStatus.addScore(loser, -loseScore);
 				}
-				roundStatus.addScore(seat, winScore);
+				roundStatus.addScore(seat, winScore + roundStatus.getPot());
 				
 				roundStatus.goNextRound(false, true);
 				roundStatus.resetPot();
 			} else {
-				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
-					if(i == roundStatus.getDealer())
-						loseScore = Calculate.getScore(han, fu, 2) + 100*extend;
-					else loseScore = Calculate.getScore(han, fu, 1) + 100*extend;
+				for(loser = (seat + 1); loser != seat; loser = ((loser + 1)%4)) {
+					if(loser == roundStatus.getDealer())
+						loseScore = Calculate.getScore(han, fu, 2, 100*extend);
+					else loseScore = Calculate.getScore(han, fu, 1, 100*extend);
 					winScore += loseScore;
-					roundStatus.addScore(i, -loseScore);
+					roundStatus.addScore(loser, -loseScore);
 				}
-				roundStatus.addScore(seat, winScore);
+				roundStatus.addScore(seat, winScore + roundStatus.getPot());
 				
 				roundStatus.goNextRound(true, false);
 				roundStatus.resetPot();
@@ -148,19 +146,17 @@ public class Room {
 			han = Integer.parseInt(arr[2]);
 			fu = Integer.parseInt(arr[3]);
 			loser = Integer.parseInt(arr[4]);
-			
-			winScore = roundStatus.getPot();
-			
+						
 			if(seat == roundStatus.getDealer()) {
-				loseScore = Calculate.getScore(han, fu, 6) + 300*extend;
-				winScore += loseScore;
+				loseScore = Calculate.getScore(han, fu, 6, 300*extend);
+				winScore = loseScore + roundStatus.getPot();
 				roundStatus.addScore(loser, -loseScore);
 				roundStatus.addScore(seat, winScore);
 				
 				roundStatus.goNextRound(false, true);
 			} else {
-				loseScore = Calculate.getScore(han, fu, 4) + 300*extend;
-				winScore += loseScore;
+				loseScore = Calculate.getScore(han, fu, 4, 300*extend);
+				winScore = loseScore + roundStatus.getPot();
 				roundStatus.addScore(loser, -loseScore);
 				roundStatus.addScore(seat, winScore);
 				roundStatus.goNextRound(true, false);
@@ -175,20 +171,20 @@ public class Room {
 			break;
 		case "chonbo":
 			loser = Integer.parseInt(arr[2]); 
-			if(seat == roundStatus.getDealer()) {
+			if(loser == roundStatus.getDealer()) {
 				score = Calculate.getScore(5, 0, 2);
-				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
+				for(int i = (loser + 1); i != loser; i = ((i + 1)%4)) {
 					roundStatus.addScore(i, score);
-					roundStatus.addScore(seat, -score);
+					roundStatus.addScore(loser, -score);
 				}
 				roundStatus.goNextRound(false, false);
 			} else {
-				for(int i = (seat + 1); i != seat; i = ((i + 1)%4)) {
+				for(int i = (loser + 1); i != loser; i = ((i + 1)%4)) {
 					if(i == roundStatus.getDealer())
 						score = Calculate.getScore(5, 0, 2);
 					else score = Calculate.getScore(5, 0, 1);
 					roundStatus.addScore(i, score);
-					roundStatus.addScore(seat, -score);
+					roundStatus.addScore(loser, -score);
 				}
 				roundStatus.goNextRound(false, false);
 			}
